@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/abscinema
+    username: myuser
+    password: secret
+    driver-class-name: org.postgresql.Driver
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+    web: DEBUG
+app:
+  default:
+    admin: admin
+    admin-password: admin
