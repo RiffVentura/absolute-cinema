@@ -1,0 +1,53 @@
+:host {
+  display: block;
+  height: 5vh;
+}
+
+header {
+  box-shadow: var(--shadow-surface);
+
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+
+  padding: var(--size-m);
+}
+
+svg {
+  height: 100%;
+  min-width: 64px;
+
+  & .text-left {
+    display: none;
+  }
+
+  & .lens-left:hover~.text-left {
+    display: inline;
+  }
+
+  & .text-right {
+    display: none;
+  }
+
+  & .lens-right:hover~.text-right {
+    display: inline;
+  }
+}
+
+nav {
+  margin: 0 var(--size-xxl);
+  height: 100%;
+
+  padding: auto 0;
+  display: flex;
+  align-items: center;
+
+  & a {
+    margin: 0 var(--size-m);
+    text-decoration: none;
+
+    &:hover {
+      border-bottom: var(--size-m) solid var(--color-accent);
+    }
+  }
+}

@@ -1,1 +1,178 @@
-/* You can add global styles to this file, and also import other style files */
+/* raleway-200 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 200;
+  src: url('./fonts/raleway-v37-latin-200.woff2') format('woff2');
+}
+
+/* raleway-200italic - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 200;
+  src: url('./fonts/raleway-v37-latin-200italic.woff2') format('woff2');
+}
+
+/* raleway-regular - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/raleway-v37-latin-regular.woff2') format('woff2');
+}
+
+/* raleway-italic - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 400;
+  src: url('./fonts/raleway-v37-latin-italic.woff2') format('woff2');
+}
+
+/* raleway-600 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 600;
+  src: url('./fonts/raleway-v37-latin-600.woff2') format('woff2');
+}
+
+/* raleway-800 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 800;
+  src: url('./fonts/raleway-v37-latin-800.woff2') format('woff2');
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color-scheme: inherit;
+}
+
+html {
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+}
+
+body {
+  line-height: 1.5;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+p,
+h1,
+h3,
+h2,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+ul,
+ol {
+  list-style-type: none;
+}
+
+a:visited {
+  color: inherit;
+}
+
+:root {
+  --color-white: #E7EDEA;
+  --color-yellow: #FFC52C;
+  --color-red: #FB0C06;
+  --color-dark: #030D4F;
+  --color-cyan: #CEECEF;
+
+  --font-text: 'Raleway', system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-text);
+
+  --color-background: var(--color-white);
+  --color-text: var(--color-dark);
+  --color-surface: var(--color-cyan);
+  --color-accent: var(--color-yellow);
+  --color-secondary: var(--color-red);
+
+  --color-error-text: oklch(from var(--color-red) 45% c h);
+  --color-error-surface: oklch(from var(--color-red) 45% c h);
+  --color-error-text-on-surface: var(--color-white);
+
+
+  --color-border: var(--color-dark);
+
+  --text-size-s: 0.875rem;
+  --text-size-m: 1rem;
+  --text-size-l: 1.25rem;
+  --text-size-xl: 1.75rem;
+  --text-size-xxl: 2.5rem;
+
+  --text-weight-thin: 200;
+  --text-weight-regular: 400;
+  --text-weight-semibold: 600;
+  --text-weight-bold: 800;
+
+  --size-s: 4px;
+  --size-m: 8px;
+  --size-l: 16px;
+  --size-xl: 32px;
+  --size-xxl: 64px;
+
+  --radius-s: 2px;
+  --radius-m: 4px;
+  --radius-l: 8px;
+
+  --shadow-surface: 0 2px 0 rgb(0 0 0 / 0.2);
+
+}
+
+html,
+body {
+  font-family: var(--font-text);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: var(--text-size-m);
+  font-weight: var(--text-weight-regular);
+}

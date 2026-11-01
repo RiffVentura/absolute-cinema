@@ -22,7 +22,7 @@ public class AdminSpaConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/admin/**")
             .addResourceLocations("classpath:/static/admin")
-            .resourceChain(true)
+            .resourceChain(false)
             .addResolver(new PathResourceResolver() {
                 @Override
                 protected Resource getResource(String path, Resource location) throws IOException {

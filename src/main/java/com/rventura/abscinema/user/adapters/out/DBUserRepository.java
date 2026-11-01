@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import com.rventura.abscinema.shared.exceptions.InvalidInputOnSaveException;
-import com.rventura.abscinema.user.domain.Role;
+import com.rventura.abscinema.security.Role;
 import com.rventura.abscinema.user.application.UserRepositoryPort;
 import com.rventura.abscinema.user.domain.User;
 import com.rventura.abscinema.user.domain.UserToCreate;

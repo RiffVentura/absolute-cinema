@@ -23,7 +23,7 @@ public class SecurityConfig {
             .formLogin(form -> form.defaultSuccessUrl("/admin/"))
             .logout(logout -> logout.logoutSuccessUrl("/"))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin/**", "/api/**").hasAuthority("ADMIN")
+                .requestMatchers("/admin/**", "/internal/**").hasAuthority("ADMIN")
                 .anyRequest().permitAll())
             .exceptionHandling(e -> e.defaultAuthenticationEntryPointFor(
                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),

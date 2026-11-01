@@ -1,0 +1,46 @@
+<h1>Movie List</h1>
+
+
+<div class="filters">
+  <input type="text" placeholder="Search movies.." />
+  <button>Filter</button>
+  <button>Sort by</button>
+  <button (click)="goToAddMoviePage()">Add</button>
+</div>
+
+<div class="list-headers">
+  <div> title</div>
+  <div> release</div>
+</div>
+
+<ul>
+  @if (movieStore.movies.error()) {
+    <p>Couldnt load movies</p>
+  } @else {
+    @for (movie of movieStore.movies.value(); track movie.id) {
+      <li>
+        <div class="col-preview">
+          <div class="image-placeholder"> {{ movie.posterUrl}}</div>
+        </div>
+        <div class="title">
+          {{ movie.title }}
+        </div>
+
+        <div class="release">
+          {{ movie.releaseDate}}
+        </div>
+        <div class="tag">
+          <span class="tag warn"></span>
+        </div>
+        <div class="col-end">
+          <button>Edit</button>
+        </div>
+      </li>
+    }
+  }
+</ul>
+
+
+
+
+

@@ -1,0 +1,92 @@
+form {
+  margin-top: var(--size-xxl);
+  width: 40rem;
+}
+
+form>header {
+  padding-bottom: var(--size-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-row {
+  margin: var(--size-l) 0;
+  display: flex;
+  flex-direction: column;
+
+  &>.validation-error {
+    color: var(--color-error-text-on-surface);
+    background-color: var(--color-error-surface);
+    margin-top: 0;
+    padding: var(--size-s) var(--size-m);
+    display: inline;
+
+    &:last-child {
+      border-radius: 0 0 var(--radius-m) var(--radius-m);
+    }
+  }
+
+  &>input,
+  &>textarea {
+    padding: var(--size-m);
+    border: 1px solid var(--color-surface);
+    box-shadow: var(--shadow-surface);
+    border-radius: var(--radius-m);
+
+    &:focus {
+      border: none;
+      border: 1px solid var(--color-accent);
+      outline: none;
+      outline-offset: 1px;
+    }
+
+  }
+
+  &>textarea {
+    resize: vertical;
+    min-height: 10rem;
+  }
+
+  &>input.invalid-field {
+    border-bottom: 10px solid;
+    border-radius: var(--radius-m) var(--radius-m) 0 0;
+    border-color: var(--color-error-surface);
+
+  }
+
+  &>input[type="date"] {
+    /* text-align: right; */
+    font-weight: var(--font-weight-thin);
+    /* width: 10rem; */
+  }
+}
+
+
+.btn {
+  padding: var(--size-s) var(--size-l);
+  background-color: var(--color-text);
+  color: var(--color-background);
+  /* font-weight: var(--text-weight-semibold); */
+  box-shadow: var(--shadow-surface);
+  /* border: 1px solid oklch(from var(--color-text) l c h / 50%); */
+  border: none;
+  border-radius: var(--radius-m);
+  user-select: none;
+}
+
+.btn-confirm {
+  background-color: var(--color-accent);
+  color: oklch(from var(--color-text) 10% 90% h);
+  font-weight: var(--text-weight-semibold);
+
+  &:hover {
+    background-color: oklch(from var(--color-accent) l 80% h);
+    color: oklch(from var(--color-text) l c h);
+  }
+}
+
+.btn-disabled {
+  background-color: oklch(from var(--color-accent) l 10% h);
+  color: oklch(from var(--color-text) l 50% h);
+}
