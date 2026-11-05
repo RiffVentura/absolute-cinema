@@ -1,0 +1,18 @@
+{
+  "name": "absolute-cinema",
+  "dockerComposeFile": "compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/absolute-cinema",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": { "version": "27", "jdkDistro": "tem" },
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" }
+  },
+  "remoteUser": "vscode",
+  "forwardPorts": [8080, 4200],
+  "customizations": {
+    "zed": {
+      "extensions": ["java", "angular", "sql", "dockerfile", "docker-compose"]
+    }
+  },
+  "postCreateCommand": "bash /workspaces/absolute-cinema/.devcontainer/post-create.sh"
+}

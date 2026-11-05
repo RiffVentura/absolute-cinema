@@ -1,0 +1,35 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    # Share postgres's network so application-dev.yaml's localhost:5432 works unchanged
+    network_mode: service:postgres
+    environment:
+      CLAUDE_CONFIG_DIR: /home/vscode/.claude
+      SPRING_PROFILES_ACTIVE: dev
+      # No Docker inside the container; postgres runs as the sidecar below instead
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+    volumes:
+      - ..:/workspaces/absolute-cinema
+      # Replaces the host's strict sandbox settings inside the container only
+      - ./claude-settings.local.json:/workspaces/absolute-cinema/.claude/settings.local.json:ro
+      - claude-config:/home/vscode/.claude
+      - m2:/home/vscode/.m2
+
+  postgres:
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_DB: abscinema
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+    # `dev` shares this service's network namespace, so its ports must be published here.
+    # Published explicitly because Zed doesn't honour devcontainer.json `forwardPorts`.
+    ports:
+      - "8080:8080" # Spring Boot
+      - "4200:4200" # ng serve (run with --host 0.0.0.0)
+
+volumes:
+  claude-config:
+  m2:
