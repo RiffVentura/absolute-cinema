@@ -2,16 +2,20 @@ package com.rventura.abscinema.movies;
 
 import java.security.Principal;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.ui.Model;
 
 @RestController
-@RequestMapping("/internal/movies")
+@RequestMapping(
+    path = "/internal/movies",
+    consumes = MediaType.APPLICATION_JSON_VALUE)
 public class MoviesController {
     @GetMapping("/")
     public ResponseEntity<Movie[]> movies() {
@@ -25,7 +29,8 @@ public class MoviesController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Movie> addNewMovie() {
+    public ResponseEntity<Movie> addNewMovie(@RequestBody MovieToSave newMovie) {
+
 
         return ResponseEntity.ok(new Movie("3", "StarWARS", "url1", "05/06"));
 

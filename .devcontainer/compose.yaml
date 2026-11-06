@@ -24,6 +24,8 @@ services:
       POSTGRES_DB: abscinema
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: secret
+    volumes:
+      - ../docker/postgres-init:/docker-entrypoint-initdb.d:ro
     # `dev` shares this service's network namespace, so its ports must be published here.
     # Published explicitly because Zed doesn't honour devcontainer.json `forwardPorts`.
     ports:

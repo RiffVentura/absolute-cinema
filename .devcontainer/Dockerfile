@@ -16,3 +16,11 @@ RUN ln -s /home/vscode/.local/bin/claude /usr/local/bin/claude \
  # Pre-create volume mount points so named volumes inherit vscode ownership instead of root
  && mkdir -p /home/vscode/.claude /home/vscode/.m2 \
  && chown vscode:vscode /home/vscode/.claude /home/vscode/.m2
+
+# Must equal the exact @playwright/test version in frontend/package.json, or the library
+# looks for a browser build that isn't installed.
+ARG PLAYWRIGHT_VERSION=1.64.1
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN bunx playwright@${PLAYWRIGHT_VERSION} install --with-deps chromium \
+ && chmod -R a+rX /ms-playwright \
+ && rm -rf /var/lib/apt/lists/* /root/.bun/install/cache
