@@ -10,6 +10,13 @@ form>header {
   align-items: center;
 }
 
+.form-error {
+  color: var(--color-error-text-on-surface);
+  background-color: var(--color-error-surface);
+  padding: var(--size-s) var(--size-m);
+  border-radius: var(--radius-m);
+}
+
 .form-row {
   margin: var(--size-l) 0;
   display: flex;

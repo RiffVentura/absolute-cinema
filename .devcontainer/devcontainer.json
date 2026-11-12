@@ -8,7 +8,7 @@
     "ghcr.io/devcontainers/features/node:1": { "version": "lts" }
   },
   "remoteUser": "vscode",
-  "forwardPorts": [8080, 4200],
+  "forwardPorts": [8080, 4200, 5432],
   "customizations": {
     "zed": {
       "extensions": ["java", "angular", "sql", "dockerfile", "docker-compose"]

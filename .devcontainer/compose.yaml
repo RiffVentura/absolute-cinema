@@ -31,6 +31,7 @@ services:
     ports:
       - "8080:8080" # Spring Boot
       - "4200:4200" # ng serve (run with --host 0.0.0.0)
+      - "5432:5432"
 
 volumes:
   claude-config:
