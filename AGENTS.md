@@ -96,6 +96,7 @@ Only SQL and full-stack tests touch Postgres. Everything else uses in-memory fak
 
 - **In-memory port fakes** live in test sources, next to the port's package: for example, `src/test/java/.../movies/application/InMemoryMovieRepository implements MovieRepositoryPort`, backed by a `Map`. Each port has one shared fake, not one per test. Fakes must behave like the real adapter where it matters, such as assigning IDs or throwing `InvalidInputOnSaveException` on duplicates.
 - Prefer fakes to Mockito mocks for ports. Use mocks only for interactions a fake can't express.
+- **Warn before changing committed tests.** If a change means editing or deleting a test that's already in git history (backend or frontend), tell the user which test and why before you change it, since that test may be guarding a behavior they rely on. Adding new tests, or changing tests that were never committed, needs no warning.
 - **Postgres tests** use the `abscinema_test` database (`src/test/resources/application-test.yaml`), so they never touch dev data. They must use `@ActiveProfiles("test")`.
   - In the devcontainer, that is the `postgres` sidecar, which is always running.
   - On the host, run `docker compose up -d` first. Spring's docker-compose support is skipped in tests.

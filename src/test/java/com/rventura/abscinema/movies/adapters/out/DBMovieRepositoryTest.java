@@ -65,4 +65,42 @@ class DBMovieRepositoryTest {
             null, "Ridley Scott", null, List.of(), null, null, null)))
             .isInstanceOf(InvalidInputOnSaveException.class);
     }
+
+    @Test
+    void findByIdReturnsTheMovieOrEmpty() {
+        Movie created = repository.create(new MovieToSave("Alien", "Ridley Scott", null, List.of("Horror"), null, null, null));
+
+        assertThat(repository.findById(created.id())).contains(created);
+        assertThat(repository.findById(-1)).isEmpty();
+    }
+
+    @Test
+    void updateReplacesAllEditableFieldsAndKeepsTheRest() {
+        Movie created = repository.create(new MovieToSave(
+            "Alien", "Ridley Scott", "Sigourney Weaver", List.of("Horror"), 117, LocalDate.of(1979, 5, 25), "In space."));
+
+        Movie updated = repository.update(created.id(), new MovieToSave(
+            "Aliens", "James Cameron", null, List.of("Action", "Sci-Fi"), 137, LocalDate.of(1986, 7, 18), null))
+            .orElseThrow();
+
+        assertThat(updated).isEqualTo(new Movie(
+            created.id(), "Aliens", "James Cameron", null, List.of("Action", "Sci-Fi"), 137,
+            LocalDate.of(1986, 7, 18), null, created.posterUrl(), created.createdAt()));
+        assertThat(repository.findById(created.id())).contains(updated);
+    }
+
+    @Test
+    void updateOfMissingMovieReturnsEmpty() {
+        assertThat(repository.update(-1, new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null)))
+            .isEmpty();
+    }
+
+    @Test
+    void updateTranslatesDatabaseRejectionIntoInvalidInputOnSave() {
+        Movie created = repository.create(new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null));
+
+        assertThatThrownBy(() -> repository.update(created.id(), new MovieToSave(
+            "Alien", null, null, List.of(), null, null, null)))
+            .isInstanceOf(InvalidInputOnSaveException.class);
+    }
 }

@@ -3,12 +3,14 @@ package com.rventura.abscinema.movies.adapters.in;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.matchesRegex;
 import org.junit.jupiter.api.Test;
+import com.jayway.jsonpath.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -137,5 +139,101 @@ class MoviesControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_MOVIE))
             .andExpect(status().is4xxClientError());
+    }
+
+    private long createMovie() throws Exception {
+        String body = mvc.perform(post("/internal/movies/").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_MOVIE))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+        return JsonPath.<Number>read(body, "$.id").longValue();
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void getReturnsTheMovie() throws Exception {
+        long id = createMovie();
+
+        mvc.perform(get("/internal/movies/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(id))
+            .andExpect(jsonPath("$.title").value("The Matrix"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void getOfMissingMovieIs404() throws Exception {
+        mvc.perform(get("/internal/movies/{id}", 9999))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER")
+    void getAsNonAdminIsForbidden() throws Exception {
+        mvc.perform(get("/internal/movies/{id}", 1))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void updateReturnsTheChangedMovie() throws Exception {
+        long id = createMovie();
+
+        mvc.perform(put("/internal/movies/{id}", id).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    { "title": "The Matrix Reloaded", "director": "The Wachowskis", "genres": ["Action"] }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(id))
+            .andExpect(jsonPath("$.title").value("The Matrix Reloaded"))
+            .andExpect(jsonPath("$.genres.length()").value(1))
+            .andExpect(jsonPath("$.mainCast").doesNotExist());
+
+        mvc.perform(get("/internal/movies/{id}", id))
+            .andExpect(jsonPath("$.title").value("The Matrix Reloaded"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void updateOfMissingMovieIs404() throws Exception {
+        mvc.perform(put("/internal/movies/{id}", 9999).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_MOVIE))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void updateRejectsMissingRequiredFields() throws Exception {
+        long id = createMovie();
+
+        mvc.perform(put("/internal/movies/{id}", id).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    { "title": "Alien" }
+                    """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors[0].field").value("director"))
+            .andExpect(jsonPath("$.errors[0].message").value("Movie needs a director"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void updateWithoutCsrfTokenIsForbidden() throws Exception {
+        mvc.perform(put("/internal/movies/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_MOVIE))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER")
+    void updateAsNonAdminIsForbidden() throws Exception {
+        mvc.perform(put("/internal/movies/{id}", 1).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_MOVIE))
+            .andExpect(status().isForbidden());
     }
 }

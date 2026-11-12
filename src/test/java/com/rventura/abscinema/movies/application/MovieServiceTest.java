@@ -50,4 +50,36 @@ class MovieServiceTest {
 
         assertThat(created.genres()).containsExactly("Horror", "Sci-Fi");
     }
+
+    @Test
+    void findByIdReturnsTheMovieOrEmpty() {
+        Movie created = service.create(new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null));
+
+        assertThat(service.findById(created.id())).contains(created);
+        assertThat(service.findById(created.id() + 1)).isEmpty();
+    }
+
+    @Test
+    void updateCleansUpInputAndKeepsIdAndCreationTime() {
+        Movie created = service.create(new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null));
+
+        Movie updated = service.update(created.id(), new MovieToSave(
+            " Aliens ", "James Cameron", "  ", List.of(" Action", "Action", "Sci-Fi"), 137, null, ""))
+            .orElseThrow();
+
+        assertThat(updated.id()).isEqualTo(created.id());
+        assertThat(updated.createdAt()).isEqualTo(created.createdAt());
+        assertThat(updated.title()).isEqualTo("Aliens");
+        assertThat(updated.director()).isEqualTo("James Cameron");
+        assertThat(updated.mainCast()).isNull();
+        assertThat(updated.synopsis()).isNull();
+        assertThat(updated.genres()).containsExactly("Action", "Sci-Fi");
+        assertThat(repository.findAll()).containsExactly(updated);
+    }
+
+    @Test
+    void updateOfMissingMovieReturnsEmpty() {
+        assertThat(service.update(42, new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null)))
+            .isEmpty();
+    }
 }

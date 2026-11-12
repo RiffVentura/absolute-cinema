@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +34,15 @@ public class MoviesController {
     public ResponseEntity<Movie> addNewMovie(@Valid @RequestBody MovieToSave newMovie) {
         Movie created = movieService.create(newMovie);
         return ResponseEntity.created(URI.create("/internal/movies/" + created.id())).body(created);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Movie> movie(@PathVariable long id) {
+        return ResponseEntity.of(movieService.findById(id));
+    }
+
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Movie> updateMovie(@PathVariable long id, @Valid @RequestBody MovieToSave movie) {
+        return ResponseEntity.of(movieService.update(id, movie));
     }
 }

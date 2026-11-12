@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import com.rventura.abscinema.movies.domain.Movie;
@@ -40,5 +41,28 @@ public class InMemoryMovieRepository implements MovieRepositoryPort {
         List<Movie> all = new ArrayList<>(movies.values());
         all.sort(Comparator.comparing(Movie::id).reversed());
         return all;
+    }
+
+    @Override
+    public Optional<Movie> findById(long id) {
+        return Optional.ofNullable(movies.get(id));
+    }
+
+    @Override
+    public Optional<Movie> update(long id, MovieToSave movie) {
+        if (movie.title() == null || movie.director() == null) {
+            throw new InvalidInputOnSaveException(new IllegalArgumentException("title and director are NOT NULL"));
+        }
+        return Optional.ofNullable(movies.computeIfPresent(id, (key, existing) -> new Movie(
+            existing.id(),
+            movie.title(),
+            movie.director(),
+            movie.mainCast(),
+            List.copyOf(movie.genres()),
+            movie.runtimeMinutes(),
+            movie.releaseDate(),
+            movie.synopsis(),
+            existing.posterUrl(),
+            existing.createdAt())));
     }
 }

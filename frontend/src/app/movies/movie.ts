@@ -28,13 +28,25 @@ export interface MovieToSave {
 @Service()
 export class MovieApi {
   private http = inject(HttpClient);
-  private _movies = httpResource<Movie[]>(() => `/internal/movies/`, { defaultValue: [] });
+  private moviesResource = httpResource<Movie[]>(() => `/internal/movies/`, { defaultValue: [] });
 
-  readonly movies = this._movies.asReadonly();
+  readonly movies = this.moviesResource.asReadonly();
 
   async create(newMovie: MovieToSave): Promise<Movie> {
     const movie = await firstValueFrom(this.http.post<Movie>('/internal/movies/', newMovie));
-    this._movies.reload();
+    this.moviesResource.reload();
+    return movie;
+  }
+
+  movie(id: () => number) {
+    return httpResource<Movie>(() => `/internal/movies/${id()}`);
+  }
+
+  async update(id: number, changedMovie: MovieToSave): Promise<Movie> {
+    const movie = await firstValueFrom(
+      this.http.put<Movie>(`/internal/movies/${id}`, changedMovie),
+    );
+    this.moviesResource.reload();
     return movie;
   }
 }

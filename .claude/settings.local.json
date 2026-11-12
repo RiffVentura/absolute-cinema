@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "blockReadsOutsideWorkingDirectories": true,
+    "blockWritesOutsideWorkingDirectories": true
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": true,
+    "filesystem": {
+      "allowWrite": [
+        "/home/ventura/.m2"
+      ],
+      "denyRead": [
+        "~/"
+      ],
+      "allowRead": [
+        "/home/ventura/etovsyo/absolute-cinema",
+        "/home/ventura/.m2"
+      ]
+    }
+  }
+}

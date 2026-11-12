@@ -14,6 +14,10 @@ class MovieListPage {
   goToAddMoviePage() {
     this.router.navigateByUrl('/new/movie');
   }
+
+  goToEditMoviePage(id: number) {
+    this.router.navigateByUrl(`/edit/movie/${id}`);
+  }
 }
 
 export const MoviesListPageRoute: Route = {

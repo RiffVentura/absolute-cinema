@@ -2,6 +2,7 @@ package com.rventura.abscinema.movies.application;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.rventura.abscinema.movies.domain.Movie;
 import com.rventura.abscinema.movies.domain.MovieToSave;
@@ -20,6 +21,14 @@ public class MovieService {
 
     public List<Movie> findAll() {
         return movieRepository.findAll();
+    }
+
+    public Optional<Movie> findById(long id) {
+        return movieRepository.findById(id);
+    }
+
+    public Optional<Movie> update(long id, MovieToSave movie) {
+        return movieRepository.update(id, normalize(movie));
     }
 
     private MovieToSave normalize(MovieToSave movie) {
