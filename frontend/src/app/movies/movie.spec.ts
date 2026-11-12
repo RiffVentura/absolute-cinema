@@ -79,4 +79,24 @@ describe('MovieApi', () => {
 
     await expect(result).resolves.toEqual(savedMovie);
   });
+
+  it('deletes a movie by id', async () => {
+    const result = api.delete(1);
+
+    http
+      .expectOne((r) => r.method === 'DELETE' && r.url === '/internal/movies/1')
+      .flush(null, { status: 204, statusText: 'No Content' });
+
+    await expect(result).resolves.toBeUndefined();
+  });
+
+  it('rejects when the movie cannot be deleted', async () => {
+    const result = api.delete(1);
+
+    http
+      .expectOne((r) => r.method === 'DELETE')
+      .flush({ title: 'Conflict' }, { status: 409, statusText: 'Conflict' });
+
+    await expect(result).rejects.toMatchObject({ status: 409 });
+  });
 });

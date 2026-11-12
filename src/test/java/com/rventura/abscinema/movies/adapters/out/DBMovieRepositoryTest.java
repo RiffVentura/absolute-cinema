@@ -9,9 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jdbc.test.autoconfigure.JdbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import com.rventura.abscinema.movies.domain.Movie;
 import com.rventura.abscinema.movies.domain.MovieToSave;
+import com.rventura.abscinema.shared.exceptions.InUseException;
 import com.rventura.abscinema.shared.exceptions.InvalidInputOnSaveException;
 
 @JdbcTest
@@ -22,6 +25,31 @@ class DBMovieRepositoryTest {
 
     @Autowired
     private DBMovieRepository repository;
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbc;
+
+    @Test
+    void deleteRemovesTheMovieAndReportsWhetherItExisted() {
+        Movie created = repository.create(new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null));
+
+        assertThat(repository.delete(created.id())).isTrue();
+        assertThat(repository.findById(created.id())).isEmpty();
+        assertThat(repository.delete(created.id())).isFalse();
+    }
+
+    @Test
+    void deleteOfMovieWithSessionsThrowsInUse() {
+        Movie created = repository.create(new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null));
+        Long hallId = jdbc.queryForObject(
+            "INSERT INTO halls (alias) VALUES ('Hall 1') RETURNING id", new MapSqlParameterSource(), Long.class);
+        jdbc.update("""
+            INSERT INTO movie_sessions (movie_id, hall_id, timeslot_start, timeslot_end)
+            VALUES (:movieId, :hallId, TIMESTAMP '2026-11-12 20:00', TIMESTAMP '2026-11-12 22:00')
+            """, new MapSqlParameterSource("movieId", created.id()).addValue("hallId", hallId));
+
+        assertThatThrownBy(() -> repository.delete(created.id())).isInstanceOf(InUseException.class);
+    }
 
     @Test
     void createInsertsAllFieldsAndReturnsGeneratedColumns() {

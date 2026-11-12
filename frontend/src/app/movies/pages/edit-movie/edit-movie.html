@@ -9,6 +9,14 @@
   <header>
     <h1>Edit movie</h1>
     <aside>
+      <button type="button" class="btn btn-danger" (click)="deleteMovie()"
+        [disabled]="deleting() || movieFieldsForm().submitting()">
+        @if (deleting()) {
+          Deleting
+        } @else {
+          Delete
+        }
+      </button>
       <button type="submit" class="btn"
         [disabled]="movieFieldsForm().invalid() || movieFieldsForm().submitting()"
         [class]="{
@@ -23,6 +31,10 @@
       </button>
     </aside>
   </header>
+
+  @if (deleteError(); as error) {
+    <p class="form-error" role="alert">{{ error }}</p>
+  }
 
   @for (error of movieFieldsForm().errors(); track $index) {
     <p class="form-error" role="alert">{{ error.message }}</p>

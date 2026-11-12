@@ -1,6 +1,7 @@
 package com.rventura.abscinema.shared.exceptions;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +11,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.rventura.abscinema.security.SecurityConfig;
@@ -25,6 +27,11 @@ class ApiExceptionHandlerTest {
         void reject() {
             throw new InvalidInputOnSaveException(new IllegalStateException("constraint violated"));
         }
+
+        @DeleteMapping("/internal/test/in-use")
+        void inUse() {
+            throw new InUseException(new IllegalStateException("still referenced"));
+        }
     }
 
     @Autowired
@@ -38,5 +45,15 @@ class ApiExceptionHandlerTest {
             .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.errors[0].field").isEmpty())
             .andExpect(jsonPath("$.errors[0].message").value("This could not be saved, check the fields and try again"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void inUseBecomesConflict() throws Exception {
+        mvc.perform(delete("/internal/test/in-use").with(csrf()))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.status").value(409))
+            .andExpect(jsonPath("$.errors[0].field").isEmpty())
+            .andExpect(jsonPath("$.errors[0].message").value("This is still in use elsewhere and can't be deleted"));
     }
 }

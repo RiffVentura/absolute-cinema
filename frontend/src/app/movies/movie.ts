@@ -49,4 +49,9 @@ export class MovieApi {
     this.moviesResource.reload();
     return movie;
   }
+
+  async delete(id: number): Promise<void> {
+    await firstValueFrom(this.http.delete<void>(`/internal/movies/${id}`));
+    this.moviesResource.reload();
+  }
 }

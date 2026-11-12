@@ -31,6 +31,10 @@ public class MovieService {
         return movieRepository.update(id, normalize(movie));
     }
 
+    public boolean delete(long id) {
+        return movieRepository.delete(id);
+    }
+
     private MovieToSave normalize(MovieToSave movie) {
         List<String> genres = movie.genres() == null
             ? List.of()

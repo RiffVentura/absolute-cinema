@@ -39,6 +39,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return body;
     }
 
+    @ExceptionHandler(InUseException.class)
+    public ProblemDetail handleInUse(InUseException e) {
+        String message = "This is still in use elsewhere and can't be deleted";
+        ProblemDetail body = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
+        body.setProperty("errors", List.of(new ValidationError(null, message)));
+        return body;
+    }
+
     // Bean Validation reports list items as "genres[0]", but forms have one input per property.
     private static String rootField(String path) {
         int end = path.length();

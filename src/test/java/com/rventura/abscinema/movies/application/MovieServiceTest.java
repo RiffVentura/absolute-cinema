@@ -78,6 +78,15 @@ class MovieServiceTest {
     }
 
     @Test
+    void deleteRemovesTheMovie() {
+        Movie created = service.create(new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null));
+
+        assertThat(service.delete(created.id())).isTrue();
+        assertThat(service.findById(created.id())).isEmpty();
+        assertThat(service.delete(created.id())).isFalse();
+    }
+
+    @Test
     void updateOfMissingMovieReturnsEmpty() {
         assertThat(service.update(42, new MovieToSave("Alien", "Ridley Scott", null, List.of(), null, null, null)))
             .isEmpty();

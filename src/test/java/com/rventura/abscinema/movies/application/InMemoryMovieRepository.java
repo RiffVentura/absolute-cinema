@@ -65,4 +65,9 @@ public class InMemoryMovieRepository implements MovieRepositoryPort {
             existing.posterUrl(),
             existing.createdAt())));
     }
+
+    @Override
+    public boolean delete(long id) {
+        return movies.remove(id) != null;
+    }
 }

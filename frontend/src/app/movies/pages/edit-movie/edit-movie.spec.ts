@@ -43,6 +43,13 @@ class FakeMovieApi {
     this.updated.push({ id, movie });
     return { ...this.movies.get(id)!, ...movie } as Movie;
   }
+
+  async delete(id: number): Promise<void> {
+    if (this.failWith) {
+      throw this.failWith;
+    }
+    this.movies.delete(id);
+  }
 }
 
 async function setUp(id = alien.id) {
@@ -71,7 +78,12 @@ async function setUp(id = alien.id) {
     await fixture.whenStable();
     fixture.detectChanges();
   };
-  return { api, fixture, el, input, type, submit };
+  const clickDelete = async () => {
+    el.querySelector<HTMLButtonElement>('button.btn-danger')!.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  };
+  return { api, fixture, el, input, type, submit, clickDelete };
 }
 
 describe('EditMoviePage', () => {
@@ -134,5 +146,56 @@ describe('EditMoviePage', () => {
     await submit();
 
     expect(el.querySelector('.form-error')?.textContent).toContain('rejected');
+  });
+
+  it('deletes the movie after confirmation and goes back to the list', async () => {
+    const { api, clickDelete } = await setUp();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+
+    await clickDelete();
+
+    expect(api.movies.has(alien.id)).toBe(false);
+    expect(navigate).toHaveBeenCalledWith('/movies');
+  });
+
+  it('keeps the movie when the deletion is not confirmed', async () => {
+    const { api, clickDelete } = await setUp();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+
+    await clickDelete();
+
+    expect(api.movies.has(alien.id)).toBe(true);
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('shows the server message when the movie cannot be deleted', async () => {
+    const { api, el, clickDelete } = await setUp();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    api.failWith = new HttpErrorResponse({
+      status: 409,
+      error: {
+        title: 'Conflict',
+        status: 409,
+        detail: 'In use',
+        errors: [{ field: null, message: "This is still in use elsewhere and can't be deleted" }],
+      },
+    });
+
+    await clickDelete();
+
+    expect(el.querySelector('.form-error')?.textContent).toContain('still in use');
+    expect(el.querySelector<HTMLButtonElement>('button.btn-danger')!.disabled).toBe(false);
+  });
+
+  it('shows a generic message when the deletion fails without details', async () => {
+    const { api, el, clickDelete } = await setUp();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    api.failWith = new HttpErrorResponse({ status: 500 });
+
+    await clickDelete();
+
+    expect(el.querySelector('.form-error')?.textContent).toContain('Could not delete');
   });
 });

@@ -1,6 +1,7 @@
 package com.rventura.abscinema.movies.adapters.in;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -234,6 +235,39 @@ class MoviesControllerTest {
         mvc.perform(put("/internal/movies/{id}", 1).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_MOVIE))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void deleteReturns204AndRemovesTheMovie() throws Exception {
+        long id = createMovie();
+
+        mvc.perform(delete("/internal/movies/{id}", id).with(csrf()))
+            .andExpect(status().isNoContent());
+
+        mvc.perform(get("/internal/movies/{id}", id))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void deleteOfMissingMovieIs404() throws Exception {
+        mvc.perform(delete("/internal/movies/{id}", 9999).with(csrf()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    void deleteWithoutCsrfTokenIsForbidden() throws Exception {
+        mvc.perform(delete("/internal/movies/{id}", 1))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER")
+    void deleteAsNonAdminIsForbidden() throws Exception {
+        mvc.perform(delete("/internal/movies/{id}", 1).with(csrf()))
             .andExpect(status().isForbidden());
     }
 }

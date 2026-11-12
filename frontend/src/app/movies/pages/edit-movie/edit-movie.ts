@@ -1,9 +1,16 @@
-import { Component, inject, linkedSignal } from '@angular/core';
+import { Component, inject, linkedSignal, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Route, Router, RouterLink } from '@angular/router';
 import { MovieApi } from '../../movie';
 import { movieFieldsSchema, toMovieFields, toMovieToSave } from '../../movie-form';
 import { form, FormField, FormRoot } from '@angular/forms/signals';
-import { toSubmissionErrors } from '../../../shared/form-errors';
+import { toSubmissionErrors, ValidationErrors } from '../../../shared/form-errors';
+
+function toDeleteErrorMessage(error: unknown): string {
+  const problem =
+    error instanceof HttpErrorResponse ? (error.error as ValidationErrors | null) : null;
+  return problem?.errors?.[0]?.message ?? 'Could not delete, try again';
+}
 
 @Component({
   selector: 'app-movie-edit',
@@ -17,6 +24,25 @@ class EditMoviePage {
   private movieId = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
 
   movie = this.movieApi.movie(() => this.movieId);
+
+  deleting = signal(false);
+  deleteError = signal<string | null>(null);
+
+  async deleteMovie() {
+    if (!confirm('Delete this movie? This cannot be undone.')) {
+      return;
+    }
+    this.deleting.set(true);
+    this.deleteError.set(null);
+    try {
+      await this.movieApi.delete(this.movieId);
+    } catch (e) {
+      this.deleteError.set(toDeleteErrorMessage(e));
+      this.deleting.set(false);
+      return;
+    }
+    await this.router.navigateByUrl('/movies');
+  }
 
   private movieFieldsModel = linkedSignal(() =>
     toMovieFields(this.movie.hasValue() ? this.movie.value() : undefined),

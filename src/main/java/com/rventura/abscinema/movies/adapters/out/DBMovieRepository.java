@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.rventura.abscinema.movies.application.MovieRepositoryPort;
 import com.rventura.abscinema.movies.domain.Movie;
 import com.rventura.abscinema.movies.domain.MovieToSave;
+import com.rventura.abscinema.shared.exceptions.InUseException;
 import com.rventura.abscinema.shared.exceptions.InvalidInputOnSaveException;
 
 @Repository
@@ -83,6 +84,15 @@ public class DBMovieRepository implements MovieRepositoryPort {
             return jdbc.query(sql, toParams(movie).addValue("id", id), rowMapper).stream().findFirst();
         } catch (DataIntegrityViolationException e) {
             throw new InvalidInputOnSaveException(e);
+        }
+    }
+
+    @Override
+    public boolean delete(long id) throws InUseException {
+        try {
+            return jdbc.update("DELETE FROM movies WHERE id = :id", new MapSqlParameterSource("id", id)) > 0;
+        } catch (DataIntegrityViolationException e) {
+            throw new InUseException(e);
         }
     }
 
